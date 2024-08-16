@@ -1,0 +1,108 @@
+/*
+ * main.cpp
+ *
+ *  Created on: 11 Jul 2024
+ *      Author: jondurrant
+ */
+
+#include "pico/stdlib.h"
+#include <stdio.h>
+
+extern "C"{
+
+#include "LCD_1in28.h"
+#include "GUI_Paint.h"
+#include "QMI8658.h"
+}
+
+
+
+int main( void )
+{
+    stdio_init_all();
+    sleep_ms(2000);
+    printf("GO\n");
+
+    if (DEV_Module_Init() != 0){
+	   return -1;
+   }
+   printf("LCD_1in28_test Demo\r\n");
+   LCD_1IN28_Init(HORIZONTAL);
+   LCD_1IN28_Clear(BLUE);
+
+   DEV_SET_PWM(100);
+
+   sleep_ms(2000);
+
+   uint32_t Imagesize = LCD_1IN28_HEIGHT * LCD_1IN28_WIDTH * 2;
+   uint16_t *image;
+   if ((image = (uint16_t *)malloc(Imagesize)) == NULL) {
+	   printf("Failed to apply for black memory...\r\n");
+   } else {
+	   Paint_NewImage(
+			   (uint8_t *)image,
+			   LCD_1IN28.WIDTH,
+			   LCD_1IN28.HEIGHT,
+			   0,
+			   GRAY);
+	   Paint_SetScale(65);
+	   Paint_Clear(WHITE);
+	   Paint_DrawCircle(
+			   LCD_1IN28.WIDTH /2,
+			   LCD_1IN28.HEIGHT/2,
+			   50,
+			   RED,
+			   DOT_PIXEL_3X3,
+			   DRAW_FILL_EMPTY);
+	   Paint_DrawCircle(
+	   			   LCD_1IN28.WIDTH /2,
+	   			   LCD_1IN28.HEIGHT/2,
+				   LCD_1IN28.HEIGHT/2-3,
+	   			   RED,
+	   			   DOT_PIXEL_3X3,
+	   			   DRAW_FILL_EMPTY);
+
+	   Paint_DrawNum(
+			   50,
+			   80,
+			   9.87654321,
+			   &Font20,
+			   3,
+			   BLACK,
+			   WHITE);
+
+	   Paint_DrawString_EN(
+			   LCD_1IN28.WIDTH /2-50,
+			   LCD_1IN28.HEIGHT/2,
+			  "DrJonEA",
+			  &Font24,
+			  BLUE,
+			  WHITE);
+
+	   LCD_1IN28_Display( image);
+
+
+   }
+
+
+   QMI8658_init();
+   float acc[3];
+   float gyro[3];
+   unsigned int tim_count;
+   float temp;
+
+    for (;;){
+    	 sleep_ms(500);
+    	 QMI8658_read_xyz( acc,  gyro,  &tim_count);
+    	 temp =  QMI8658_readTemp();
+    	 printf("ACC %.2f, %.2f, %.2f  GYRO %.2f, %.2f, %.2f Time %d, %0.2fC \n",
+    			 acc[0], acc[1], acc[2],
+				 gyro[0], gyro[1], gyro[2],
+				 tim_count,
+				 temp
+    			 );
+
+
+    }
+
+}
