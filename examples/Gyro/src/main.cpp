@@ -15,6 +15,8 @@ extern "C"{
 #include "QMI8658.h"
 }
 
+#include <math.h>
+#include "IMUfilter.h"
 
 
 int main( void )
@@ -90,11 +92,42 @@ int main( void )
    float gyro[3];
    unsigned int tim_count;
    float temp;
+   IMUfilter imuFilter(0.01, 0.1);
 
     for (;;){
-    	 sleep_ms(500);
-    	 QMI8658_read_xyz( acc,  gyro,  &tim_count);
+    	 //sleep_ms(500);
+
+    	 for (int i=0; i < 100; i++){
+    		 QMI8658_read_xyz( acc,  gyro,  &tim_count);
+    		 imuFilter.updateFilter(
+    				 gyro[0],
+					 gyro[1],
+					 gyro[2],
+					 acc[0],
+					 acc[1],
+					 acc[2]
+					 );
+    		 sleep_ms(10);
+    	 }
     	 temp =  QMI8658_readTemp();
+
+    	 /*
+    	 printf("ACC %.2f, %.2f, %.2f  GYRO %.2f, %.2f, %.2f Time %d, %0.2fC \n",
+    	    			 acc[0], acc[1], acc[2],
+    					 gyro[0], gyro[1], gyro[2],
+    					 tim_count,
+    					 temp
+    	    			 );
+    	    			 */
+
+    	 imuFilter.computeEuler();
+    	 printf("RPY %.2f, %.2f, %.2f\n",
+    			 imuFilter.getRoll(),
+				 imuFilter.getPitch(),
+				 imuFilter.getYaw()
+    			 );
+
+    	 /*
     	 printf("ACC %.2f, %.2f, %.2f  GYRO %.2f, %.2f, %.2f Time %d, %0.2fC \n",
     			 acc[0], acc[1], acc[2],
 				 gyro[0], gyro[1], gyro[2],
@@ -102,6 +135,15 @@ int main( void )
 				 temp
     			 );
 
+    	 double apitch =  atan (acc[0]/sqrt(acc[1]*acc[1] + acc[2]*acc[2])) ;
+    	 double aroll = atan (acc[1]/sqrt(acc[0]*acc[0] + acc[2]*acc[2]));
+    	 double ayaw = atan (sqrt(acc[0]*acc[0] + acc[2]*acc[2])/acc[2]);
+    	 printf("APRY %.2f, %.2f, %.2f\n", apitch, aroll, ayaw);
+    	 double gpitch =  atan (gyro[0]/sqrt(gyro[1]*gyro[1] + gyro[2]*gyro[2])) ;
+    	 double groll = atan (gyro[1]/sqrt(gyro[0]*gyro[0] + gyro[2]*gyro[2]));
+    	 double gyaw = atan (sqrt(gyro[0]*gyro[0] + gyro[2]*gyro[2])/gyro[2]);
+    	 printf("GPRY %.2f, %.2f, %.2f\n", gpitch, groll, gyaw);
+    	 */
 
     }
 

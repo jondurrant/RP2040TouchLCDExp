@@ -35,7 +35,11 @@
 #include "hardware/spi.h"
 #include "hardware/i2c.h"
 #include "hardware/pwm.h"
+#include "hardware/dma.h"
+#include "hardware/pll.h"
+#include "hardware/clocks.h"
 
+#define PLL_SYS_KHZ (270 * 1000)
 
 #define LCD_SPI_PORT    (spi1)
 #define SENSOR_I2C_PORT (i2c1)
@@ -63,6 +67,9 @@
 #define BAR_CHANNEL     (3)
 
 /*------------------------------------------------------------------------------------------------------*/
+
+extern uint dma_tx;
+extern dma_channel_config c;
 
 void DEV_Delay_ms(uint32_t xms);
 void DEV_Delay_us(uint32_t xus);

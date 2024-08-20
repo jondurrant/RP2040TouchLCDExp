@@ -65,13 +65,18 @@ void CST816S_Set_Mode(uint8_t mode)
     if (mode == CST816S_Point_Mode)
     {
         // 
-        CST816S_I2C_Write(CST816_IrqCtl, 0x41);
-        
+        CST816S_I2C_Write(CST816_IrqCtl, 0x41);    
+        Touch_CTS816.x_point = 0;
+        Touch_CTS816.y_point = 0;
+        Touch_CTS816.mode = mode;
     }
     else if (mode == CST816S_Gesture_Mode)
     {
         CST816S_I2C_Write(CST816_IrqCtl, 0X11);
         CST816S_I2C_Write(CST816_MotionMask, 0x01);
+        Touch_CTS816.x_point = 0;
+        Touch_CTS816.y_point = 0;
+        Touch_CTS816.mode = mode;
     }
     else
     {

@@ -29,6 +29,8 @@
 #include "DEV_Config.h"
 
 uint slice_num;
+uint dma_tx;
+dma_channel_config c;
 
 /**
  * delay x ms
@@ -164,6 +166,16 @@ Info:
 ******************************************************************************/
 uint8_t DEV_Module_Init(void)
 {
+    // CLOCK Config
+    set_sys_clock_khz(PLL_SYS_KHZ, true);
+    clock_configure(
+        clk_peri,
+        0,                                                
+        CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS, 
+        PLL_SYS_KHZ * 1000,                               
+        PLL_SYS_KHZ * 1000                              
+    );
+
     stdio_init_all();
     // GPIO Config
     DEV_GPIO_Init();
@@ -178,17 +190,25 @@ uint8_t DEV_Module_Init(void)
     pwm_set_chan_level(slice_num, PWM_CHAN_B, 0);
     pwm_set_clkdiv(slice_num, 50);
     pwm_set_enabled(slice_num, true);
-
     // SPI Config
-    spi_init(LCD_SPI_PORT, 40000 * 1000);
+    spi_init(LCD_SPI_PORT, 270000 * 1000);
     gpio_set_function(LCD_CLK_PIN, GPIO_FUNC_SPI);
     gpio_set_function(LCD_MOSI_PIN, GPIO_FUNC_SPI);
+    // DMA Config
+    dma_tx = dma_claim_unused_channel(true);
+    c = dma_channel_get_default_config(dma_tx);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_8); 
+    channel_config_set_dreq(&c, spi_get_dreq(LCD_SPI_PORT, true));
     // I2C Config
     i2c_init(SENSOR_I2C_PORT, 400 * 1000);
     gpio_set_function(DEV_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(DEV_SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(DEV_SDA_PIN);
     gpio_pull_up(DEV_SCL_PIN);
+    // Timer Config
+    // IRQ Config
+    DEV_KEY_Config(Touch_INT_PIN);
+
 
     printf("DEV_Module_Init OK \r\n");
     return 0;

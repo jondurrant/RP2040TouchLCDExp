@@ -1,0 +1,6 @@
+[submodule "lib/OpenIMUFilter"]
+	path = lib/OpenIMUFilter
+	url = https://github.com/hustcalm/OpenIMUFilter
+[submodule "lib/lvgl"]
+	path = lib/lvgl
+	url = https://github.com/lvgl/lvgl

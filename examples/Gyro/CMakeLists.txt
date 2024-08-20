@@ -24,6 +24,9 @@ include(${LIB_DIR}/QMI8658/CMakeLists.txt)
 include(${LIB_DIR}/Touch/CMakeLists.txt)
 include(${LIB_DIR}/Fonts/CMakeLists.txt)
 
+set(OPENIMUFILTER_DIR "${CMAKE_CURRENT_LIST_DIR}/../../lib/OpenIMUFilter")
+include(openIMUFilter.cmake)
+
 add_subdirectory(src)
 
 #Set up files for the release packages

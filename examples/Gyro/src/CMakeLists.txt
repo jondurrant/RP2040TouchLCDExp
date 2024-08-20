@@ -14,6 +14,7 @@ target_link_libraries(${NAME}
 	hardware_clocks 
 	hardware_rtc 
 	hardware_adc
+	openimufilter
 )
 
 # create map/bin/hex file etc.
