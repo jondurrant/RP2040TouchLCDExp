@@ -46,7 +46,7 @@ void Widgets_Init(void)
     lv_style_set_shadow_width(&style_base, 10);
     lv_style_set_shadow_ofs_y(&style_base, 5);
     lv_style_set_shadow_opa(&style_base, LV_OPA_50);
-    lv_style_set_text_color(&style_base, lv_color_white());
+    lv_style_set_text_color(&style_base, lv_color_make(0, 0, 0xFF));
     lv_style_set_width(&style_base, 100);
     lv_style_set_height(&style_base, LV_SIZE_CONTENT);
 
@@ -194,13 +194,42 @@ void Widgets_Init(void)
 	lv_anim_set_values(&a, 0, 360);
 	lv_anim_start(&a);
 
+	//Label
+	static lv_style_t labelSt;
+	lv_style_init(&labelSt);
+	lv_style_set_text_font(&labelSt, &lv_font_montserrat_18);
+	lv_style_set_text_color(
+			&labelSt,
+			lv_color_make(0, 0x50, 0x10));
+
 
 	lv_obj_t * label1 = lv_label_create(tileJD);
 	lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);     /*Break the long lines*/
 	lv_label_set_text(label1, "Dr Jon EA");
 	lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
 	lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
-	lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
+	lv_obj_align(label1, LV_ALIGN_CENTER, 0, -20);
+	lv_obj_add_style(label1 , &labelSt,  LV_PART_MAIN);
+
+
+	//Button Tile
+	 lv_obj_t *tileBtn = lv_tileview_add_tile(tv, 0, 1, LV_DIR_TOP|LV_DIR_BOTTOM);
+	 /*Create a button and use the new styles*/
+	 lv_obj_t * btn = lv_btn_create(tileBtn);
+	 /* Remove the styles coming from the theme
+	  * Note that size and position are also stored as style properties
+	  * so lv_obj_remove_style_all will remove the set size and position too */
+	 lv_obj_remove_style_all(btn);
+	// lv_obj_set_pos(btn, 0, 0);
+	 lv_obj_set_size(btn, 120, 50);
+	 lv_obj_center(btn);
+	 lv_obj_add_style(btn, &style_base, 0);
+	 lv_obj_add_style(btn, &style_press, LV_STATE_PRESSED);
+
+	 /*Add a label to the button*/
+	 lv_obj_t * label = lv_label_create(btn);
+	 lv_label_set_text(label, "Button");
+	 lv_obj_center(label);
 
 }
 
